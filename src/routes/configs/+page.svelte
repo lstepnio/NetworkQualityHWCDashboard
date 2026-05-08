@@ -13,6 +13,14 @@
 			{data.configs.total === 1 ? 'row' : 'rows'} · exactly one is active at a time
 		</span>
 	{/snippet}
+	{#snippet actions()}
+		<a
+			href="/configs/new"
+			class="rounded-md bg-pink-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-pink-600"
+		>
+			New config
+		</a>
+	{/snippet}
 </PageHeader>
 
 <Section flush>

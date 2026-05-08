@@ -69,3 +69,41 @@ export function listConfigs(includeDocument = false): Promise<ConfigList> {
 export function getConfig(version: string): Promise<ConfigSummary> {
 	return adminFetch<ConfigSummary>(`/admin/cert-configs/${encodeURIComponent(version)}`);
 }
+
+async function adminWrite<T>(path: string, body: unknown): Promise<T> {
+	const res = await fetch(`${backendURL()}${path}`, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${adminToken()}`,
+			'Content-Type': 'application/json'
+		},
+		body: body == null ? undefined : JSON.stringify(body),
+		cache: 'no-store'
+	});
+	if (!res.ok) {
+		const text = await res.text().catch(() => '');
+		throw new BackendError(res.status, text || res.statusText);
+	}
+	return (await res.json()) as T;
+}
+
+export class BackendError extends Error {
+	status: number;
+	body: string;
+	constructor(status: number, body: string) {
+		super(`${status}: ${body}`);
+		this.status = status;
+		this.body = body;
+	}
+}
+
+export function createConfig(document: Record<string, unknown>): Promise<ConfigSummary> {
+	return adminWrite<ConfigSummary>('/admin/cert-configs', document);
+}
+
+export function activateConfig(version: string): Promise<ConfigSummary> {
+	return adminWrite<ConfigSummary>(
+		`/admin/cert-configs/${encodeURIComponent(version)}/activate`,
+		null
+	);
+}
