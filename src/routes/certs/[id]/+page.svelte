@@ -57,8 +57,25 @@
 				</dd>
 			</div>
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
-				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">hsn (hashed)</dt>
-				<dd class="font-mono text-xs break-all">{summary.hsn ?? '—'}</dd>
+				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">hsn / serial</dt>
+				<dd class="font-mono text-xs break-all">
+					{#if summary.hsn}
+						{summary.hsn}
+						{#if summary.hsn.length === 64 && /^[0-9a-f]+$/.test(summary.hsn)}
+							<span class="text-muted">(legacy hash — pre-policy update)</span>
+						{/if}
+					{:else}
+						—
+					{/if}
+				</dd>
+			</div>
+			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
+				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">
+					publicIp (hashed)
+				</dt>
+				<dd class="font-mono text-xs break-all">
+					{summary.publicIpHash ?? '—'}
+				</dd>
 			</div>
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
 				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">config_version</dt>

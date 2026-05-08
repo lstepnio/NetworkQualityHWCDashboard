@@ -46,6 +46,8 @@ export function listCerts(filters: CertFilters = {}): Promise<CertList> {
 			tier: filters.tier,
 			deviceId: filters.deviceId,
 			configVersion: filters.configVersion,
+			hsn: filters.hsn,
+			publicIp: filters.publicIp,
 			from: filters.from,
 			to: filters.to,
 			limit: filters.limit,

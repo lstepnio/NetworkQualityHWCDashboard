@@ -19,6 +19,7 @@ export type CertSummary = {
 	downloadSteadyMbps?: number;
 	uploadSteadyMbps?: number;
 	latencyMedianMs?: number;
+	publicIpHash?: string; // never the raw IP; backend hashes search inputs
 	receivedAt: string;
 };
 
@@ -52,6 +53,8 @@ export type CertFilters = {
 	tier?: string;
 	deviceId?: string;
 	configVersion?: string;
+	hsn?: string;
+	publicIp?: string;
 	from?: string;
 	to?: string;
 	limit?: number;
