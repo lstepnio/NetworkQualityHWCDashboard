@@ -1,0 +1,40 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm check
+
+      - name: Build
+        env:
+          # Server components run their fetch at request time, not build time.
+          # Provide harmless placeholders so the build doesn't error on the
+          # required env-var assertion.
+          NETWORKQUALITY_BACKEND_URL: http://localhost:8080
+          NETWORKQUALITY_ADMIN_TOKEN: ci-build-only
+        run: pnpm build
