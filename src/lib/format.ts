@@ -47,6 +47,15 @@ export function humanizeDelay(seconds: number | null | undefined): string {
 	return `${Math.round(seconds / 86_400)}d`;
 }
 
+/** Format a byte count as the largest readable unit (B/KB/MB/GB). */
+export function formatBytes(bytes: number | null | undefined): string {
+	if (bytes == null) return '—';
+	if (bytes < 1024) return `${bytes} B`;
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+	if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+	return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
+}
+
 export function tierLabel(tier: string): string {
 	switch (tier) {
 		case 'uhd_hdr':

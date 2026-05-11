@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import Logo from './Logo.svelte';
-	import { Activity, FileText, MonitorSmartphone, Settings2 } from 'lucide-svelte';
+	import { Activity, FileText, MonitorSmartphone, Package, Settings2 } from 'lucide-svelte';
 
 	const links = [
 		{ href: '/', label: 'Overview', icon: Activity },
 		{ href: '/certs', label: 'Certifications', icon: FileText },
 		{ href: '/devices', label: 'Devices', icon: MonitorSmartphone },
-		{ href: '/configs', label: 'Configurations', icon: Settings2 }
+		{ href: '/configs', label: 'Configurations', icon: Settings2 },
+		{ href: '/app-versions', label: 'App Versions', icon: Package }
 	];
 
 	function isActive(href: string, path: string): boolean {

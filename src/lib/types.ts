@@ -74,3 +74,18 @@ export type QueueStats = {
 	p95Seconds: number | null;
 	maxSeconds: number | null;
 };
+
+export type AppVersionSummary = {
+	latestVersionCode: number;
+	latestVersionName: string;
+	minRequiredVersionCode: number;
+	publishedAt?: string;
+	isActive: boolean;
+	createdAt: string;
+	document?: Record<string, unknown>;
+};
+
+export type AppVersionList = {
+	items: AppVersionSummary[];
+	total: number;
+};

@@ -1,5 +1,7 @@
 import { env } from '$env/dynamic/private';
 import type {
+	AppVersionList,
+	AppVersionSummary,
 	CertDetail,
 	CertFilters,
 	CertList,
@@ -114,4 +116,22 @@ export function activateConfig(version: string): Promise<ConfigSummary> {
 		`/admin/cert-configs/${encodeURIComponent(version)}/activate`,
 		null
 	);
+}
+
+export function listAppVersions(includeDocument = false): Promise<AppVersionList> {
+	return adminFetch<AppVersionList>(
+		`/admin/app-versions${buildQuery({ includeDocument: includeDocument ? 'true' : undefined })}`
+	);
+}
+
+export function getAppVersion(versionCode: number): Promise<AppVersionSummary> {
+	return adminFetch<AppVersionSummary>(`/admin/app-versions/${versionCode}`);
+}
+
+export function createAppVersion(document: Record<string, unknown>): Promise<AppVersionSummary> {
+	return adminWrite<AppVersionSummary>('/admin/app-versions', document);
+}
+
+export function activateAppVersion(versionCode: number): Promise<AppVersionSummary> {
+	return adminWrite<AppVersionSummary>(`/admin/app-versions/${versionCode}/activate`, null);
 }
