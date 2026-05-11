@@ -5,7 +5,8 @@
 	import TierBadge from '$lib/components/TierBadge.svelte';
 	import TierDistributionChart from '$lib/components/charts/TierDistributionChart.svelte';
 	import ThroughputChart from '$lib/components/charts/ThroughputChart.svelte';
-	import { formatAbsolute, formatMbps, formatMs, shortId } from '$lib/format';
+	import { formatMbps, formatMs, shortId } from '$lib/format';
+	import LocalTime from '$lib/components/LocalTime.svelte';
 
 	const TIERS = ['uhd_hdr', 'uhd', 'hd', 'sd', 'none'];
 
@@ -50,7 +51,10 @@
 	<Kpi label="Total runs" value={data.certs.total.toLocaleString()} emphasis />
 	<Kpi label="Avg download" value={formatMbps(avgDownload)} />
 	<Kpi label="Avg latency" value={formatMs(avgLatency)} />
-	<Kpi label="First seen" value={formatAbsolute(oldest.receivedAt)} mono hint="last seen {formatAbsolute(latest.receivedAt)}" />
+	<Kpi label="First seen" mono>
+		{#snippet value()}<LocalTime iso={oldest.receivedAt} />{/snippet}
+		{#snippet hint()}last seen <LocalTime iso={latest.receivedAt} />{/snippet}
+	</Kpi>
 </div>
 
 <div class="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
@@ -76,7 +80,7 @@
 				<tbody>
 					{#each data.certs.items as c (c.certificationId)}
 						<tr class="border-b border-border transition-colors hover:bg-white/[0.025]">
-							<td class="px-4 py-2.5 text-xs text-muted whitespace-nowrap">{formatAbsolute(c.receivedAt)}</td>
+							<td class="px-4 py-2.5 text-xs text-muted whitespace-nowrap"><LocalTime iso={c.receivedAt} /></td>
 							<td class="px-4 py-2.5">
 								<a
 									href="/certs/{c.certificationId}"

@@ -2,7 +2,8 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import TierBadge from '$lib/components/TierBadge.svelte';
-	import { formatAbsolute, formatMbps, shortId } from '$lib/format';
+	import { formatMbps, shortId } from '$lib/format';
+	import LocalTime from '$lib/components/LocalTime.svelte';
 	import type { CertSummary } from '$lib/types';
 
 	let { data } = $props();
@@ -90,7 +91,7 @@
 						<td class="tabular-nums px-4 py-2.5 text-right text-xs">{d.runs}</td>
 						<td class="tabular-nums px-4 py-2.5 text-right text-xs">{formatMbps(d.avgDownload)}</td>
 						<td class="px-4 py-2.5"><TierBadge tier={d.latestTier} /></td>
-						<td class="px-4 py-2.5 text-xs text-muted">{formatAbsolute(d.latestReceivedAt)}</td>
+						<td class="px-4 py-2.5 text-xs text-muted"><LocalTime iso={d.latestReceivedAt} /></td>
 					</tr>
 				{/each}
 				{#if devices.length === 0}
