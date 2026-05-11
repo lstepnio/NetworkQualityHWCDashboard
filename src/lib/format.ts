@@ -29,6 +29,24 @@ export function shortId(id: string): string {
 	return id.slice(0, 8);
 }
 
+// Threshold at which a queue-delayed cert is worth surfacing to the
+// operator. Matches the backend's queuedOnly SQL filter (>5 min).
+export const QUEUED_BADGE_THRESHOLD_S = 300;
+
+/**
+ * Humanizes a queue-delay duration. Picks the largest meaningful unit:
+ * "3d", "5h", "12m", "47s". Returns "—" for null/undefined; "0s" for
+ * sub-second values.
+ */
+export function humanizeDelay(seconds: number | null | undefined): string {
+	if (seconds == null) return '—';
+	if (seconds < 1) return '0s';
+	if (seconds < 60) return `${Math.round(seconds)}s`;
+	if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
+	if (seconds < 86_400) return `${Math.round(seconds / 3600)}h`;
+	return `${Math.round(seconds / 86_400)}d`;
+}
+
 export function tierLabel(tier: string): string {
 	switch (tier) {
 		case 'uhd_hdr':

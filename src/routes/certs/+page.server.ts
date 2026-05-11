@@ -9,6 +9,7 @@ export const load = async ({ url }: ServerLoadEvent) => {
 	const configVersion = url.searchParams.get('configVersion') ?? undefined;
 	const hsn = url.searchParams.get('hsn') ?? undefined;
 	const publicIp = url.searchParams.get('publicIp') ?? undefined;
+	const queuedOnly = url.searchParams.get('queuedOnly') === 'true';
 	const limit = Number(url.searchParams.get('limit') ?? PAGE_SIZE);
 	const offset = Number(url.searchParams.get('offset') ?? 0);
 
@@ -18,12 +19,13 @@ export const load = async ({ url }: ServerLoadEvent) => {
 		configVersion,
 		hsn,
 		publicIp,
+		queuedOnly,
 		limit,
 		offset
 	});
 	return {
 		certs,
-		filters: { tier, deviceId, configVersion, hsn, publicIp },
+		filters: { tier, deviceId, configVersion, hsn, publicIp, queuedOnly },
 		limit,
 		offset
 	};

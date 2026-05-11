@@ -20,6 +20,11 @@ export type CertSummary = {
 	uploadSteadyMbps?: number;
 	latencyMedianMs?: number;
 	publicIpHash?: string; // never the raw IP; backend hashes search inputs
+	enqueuedAt?: string;
+	submittedAt?: string;
+	// submittedAt - completedAt in seconds, clamped >= 0. Omitted by the
+	// backend when submittedAt is null (older-client payload pre-v1.1.0).
+	queueDelaySeconds?: number;
 	receivedAt: string;
 };
 
@@ -55,8 +60,17 @@ export type CertFilters = {
 	configVersion?: string;
 	hsn?: string;
 	publicIp?: string;
+	queuedOnly?: boolean;
 	from?: string;
 	to?: string;
 	limit?: number;
 	offset?: number;
+};
+
+export type QueueStats = {
+	windowHours: number;
+	sampleSize: number;
+	medianSeconds: number | null;
+	p95Seconds: number | null;
+	maxSeconds: number | null;
 };

@@ -3,9 +3,10 @@
 	import Kpi from '$lib/components/Kpi.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import TierBadge from '$lib/components/TierBadge.svelte';
+	import QueuedBadge from '$lib/components/QueuedBadge.svelte';
 	import TierDistributionChart from '$lib/components/charts/TierDistributionChart.svelte';
 	import ThroughputChart from '$lib/components/charts/ThroughputChart.svelte';
-	import { formatAbsolute, formatMbps, formatMs, shortId } from '$lib/format';
+	import { formatAbsolute, formatMbps, formatMs, humanizeDelay, shortId } from '$lib/format';
 
 	let { data } = $props();
 	const TIERS = ['uhd_hdr', 'uhd', 'hd', 'sd', 'none'];
@@ -63,6 +64,39 @@
 	<ThroughputChart data={throughput} />
 </div>
 
+{#if data.queueStats}
+	<div class="mt-6">
+		<Section
+			title="Publish-queue health"
+			description="STBs queue results locally when the publish API is unavailable. Spikes mean the API was down or specific networks struggled."
+		>
+			<div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+				<Kpi
+					label="Sample (last 24h)"
+					value={data.queueStats.sampleSize.toLocaleString()}
+					hint="non-null submittedAt"
+				/>
+				<Kpi
+					label="Median delay"
+					value={humanizeDelay(data.queueStats.medianSeconds)}
+					hint="50th percentile"
+				/>
+				<Kpi
+					label="P95 delay"
+					value={humanizeDelay(data.queueStats.p95Seconds)}
+					hint="95th percentile"
+				/>
+				<Kpi
+					label="Max delay"
+					value={humanizeDelay(data.queueStats.maxSeconds)}
+					hint="worst row in window"
+					emphasis={data.queueStats.maxSeconds != null && data.queueStats.maxSeconds > 3600}
+				/>
+			</div>
+		</Section>
+	</div>
+{/if}
+
 <div class="mt-6">
 	<Section title="Recent certifications" description="Latest five runs across the fleet" flush>
 		{#if latest.length === 0}
@@ -79,13 +113,14 @@
 								{shortId(c.certificationId)}
 							</span>
 							<TierBadge tier={c.achievedTier} />
-							<span class="tabular-nums hidden text-xs text-muted sm:inline">
+							<QueuedBadge delaySeconds={c.queueDelaySeconds} />
+							<span class="tabular-nums hidden text-xs text-muted lg:inline">
 								{formatMbps(c.downloadSteadyMbps)} ↓ · {formatMbps(c.uploadSteadyMbps)} ↑ · {formatMs(
 									c.latencyMedianMs
 								)}
 							</span>
 							<span class="ml-auto text-xs text-muted">
-								{formatAbsolute(c.receivedAt)}
+								{formatAbsolute(c.completedAt)}
 							</span>
 							<span
 								class="text-muted transition-colors group-hover:text-pink-500"

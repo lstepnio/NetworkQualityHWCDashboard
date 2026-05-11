@@ -3,6 +3,7 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import TierBadge from '$lib/components/TierBadge.svelte';
+	import QueuedBadge from '$lib/components/QueuedBadge.svelte';
 	import { formatAbsolute, formatMbps, formatMs, shortId } from '$lib/format';
 
 	let { data } = $props();
@@ -19,7 +20,8 @@
 			},
 			data.filters.configVersion && { k: 'configVersion', v: data.filters.configVersion },
 			data.filters.hsn && { k: 'hsn', v: data.filters.hsn },
-			data.filters.publicIp && { k: 'publicIp', v: data.filters.publicIp }
+			data.filters.publicIp && { k: 'publicIp', v: data.filters.publicIp },
+			data.filters.queuedOnly && { k: 'queuedOnly', v: 'true' }
 		].filter(Boolean) as { k: string; v: string }[]
 	);
 
@@ -33,6 +35,7 @@
 		if (data.filters.configVersion) p.set('configVersion', data.filters.configVersion);
 		if (data.filters.hsn) p.set('hsn', data.filters.hsn);
 		if (data.filters.publicIp) p.set('publicIp', data.filters.publicIp);
+		if (data.filters.queuedOnly) p.set('queuedOnly', 'true');
 		if (data.limit !== 50) p.set('limit', String(data.limit));
 		if (newOffset !== 0) p.set('offset', String(newOffset));
 		const qs = p.toString();
@@ -102,7 +105,47 @@
 	{#if data.filters.configVersion}
 		<input type="hidden" name="configVersion" value={data.filters.configVersion} />
 	{/if}
+	{#if data.filters.queuedOnly}
+		<input type="hidden" name="queuedOnly" value="true" />
+	{/if}
 </form>
+
+<div class="mb-4 flex items-center gap-3 text-sm">
+	{#if data.filters.queuedOnly}
+		<a
+			href={(() => {
+				const p = new URLSearchParams();
+				if (data.filters.tier) p.set('tier', data.filters.tier);
+				if (data.filters.deviceId) p.set('deviceId', data.filters.deviceId);
+				if (data.filters.configVersion) p.set('configVersion', data.filters.configVersion);
+				if (data.filters.hsn) p.set('hsn', data.filters.hsn);
+				if (data.filters.publicIp) p.set('publicIp', data.filters.publicIp);
+				const qs = p.toString();
+				return qs ? `/certs?${qs}` : '/certs';
+			})()}
+			class="inline-flex items-center gap-2 rounded-md border border-amber-400/40 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-300 transition-colors hover:bg-amber-400/15"
+		>
+			<span class="size-1.5 rounded-full bg-amber-400"></span>
+			Showing queue-delayed only (&gt; 5 min) — click to clear
+		</a>
+	{:else}
+		<a
+			href={(() => {
+				const p = new URLSearchParams();
+				if (data.filters.tier) p.set('tier', data.filters.tier);
+				if (data.filters.deviceId) p.set('deviceId', data.filters.deviceId);
+				if (data.filters.configVersion) p.set('configVersion', data.filters.configVersion);
+				if (data.filters.hsn) p.set('hsn', data.filters.hsn);
+				if (data.filters.publicIp) p.set('publicIp', data.filters.publicIp);
+				p.set('queuedOnly', 'true');
+				return `/certs?${p.toString()}`;
+			})()}
+			class="text-xs text-muted hover:text-foreground"
+		>
+			Show only queue-delayed (&gt; 5 min)
+		</a>
+	{/if}
+</div>
 
 {#if pills.length > 0}
 	<div class="mb-4 flex flex-wrap items-center gap-2">
@@ -123,7 +166,7 @@
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="hairline">
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">When</th>
+					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Certified</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">ID</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Device</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">HSN</th>
@@ -139,8 +182,8 @@
 			<tbody>
 				{#each data.certs.items as c (c.certificationId)}
 					<tr class="border-b border-border transition-colors hover:bg-white/[0.025]">
-						<td class="px-4 py-2.5 text-xs text-muted whitespace-nowrap">
-							{formatAbsolute(c.receivedAt)}
+						<td class="px-4 py-2.5 text-xs whitespace-nowrap">
+							<span class="text-muted">{formatAbsolute(c.completedAt)}</span>
 						</td>
 						<td class="px-4 py-2.5">
 							<a
@@ -149,6 +192,11 @@
 							>
 								{shortId(c.certificationId)}
 							</a>
+							{#if c.queueDelaySeconds != null && c.queueDelaySeconds > 300}
+								<div class="mt-1">
+									<QueuedBadge delaySeconds={c.queueDelaySeconds} />
+								</div>
+							{/if}
 						</td>
 						<td class="px-4 py-2.5">
 							<a

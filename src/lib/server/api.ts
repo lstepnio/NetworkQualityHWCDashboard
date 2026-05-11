@@ -4,7 +4,8 @@ import type {
 	CertFilters,
 	CertList,
 	ConfigList,
-	ConfigSummary
+	ConfigSummary,
+	QueueStats
 } from '$lib/types';
 
 function backendURL(): string {
@@ -48,12 +49,17 @@ export function listCerts(filters: CertFilters = {}): Promise<CertList> {
 			configVersion: filters.configVersion,
 			hsn: filters.hsn,
 			publicIp: filters.publicIp,
+			queuedOnly: filters.queuedOnly ? 'true' : undefined,
 			from: filters.from,
 			to: filters.to,
 			limit: filters.limit,
 			offset: filters.offset
 		})}`
 	);
+}
+
+export function getQueueStats(windowHours = 24): Promise<QueueStats> {
+	return adminFetch<QueueStats>(`/admin/queue-stats?windowHours=${windowHours}`);
 }
 
 export function getCert(id: string): Promise<CertDetail> {

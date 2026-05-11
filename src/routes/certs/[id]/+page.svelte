@@ -3,8 +3,9 @@
 	import Kpi from '$lib/components/Kpi.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import TierBadge from '$lib/components/TierBadge.svelte';
+	import QueuedBadge from '$lib/components/QueuedBadge.svelte';
 	import JsonBlock from '$lib/components/JsonBlock.svelte';
-	import { formatAbsolute, formatMbps, formatMs, shortId } from '$lib/format';
+	import { formatAbsolute, formatMbps, formatMs, humanizeDelay, shortId } from '$lib/format';
 
 	let { data } = $props();
 	const summary = $derived(data.detail.summary);
@@ -12,9 +13,10 @@
 
 <PageHeader eyebrow="Certification" title="{shortId(summary.certificationId)}…">
 	{#snippet subtitle()}
-		<span class="flex items-center gap-3">
+		<span class="flex flex-wrap items-center gap-3">
 			<TierBadge tier={summary.achievedTier} />
-			<span>{formatAbsolute(summary.receivedAt)}</span>
+			<span>Certified {formatAbsolute(summary.completedAt)}</span>
+			<QueuedBadge delaySeconds={summary.queueDelaySeconds} />
 		</span>
 	{/snippet}
 	{#snippet actions()}
@@ -88,6 +90,28 @@
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
 				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">completed_at</dt>
 				<dd>{formatAbsolute(summary.completedAt)}</dd>
+			</div>
+			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
+				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">enqueued_at</dt>
+				<dd>{summary.enqueuedAt ? formatAbsolute(summary.enqueuedAt) : '—'}</dd>
+			</div>
+			<div
+				class="grid grid-cols-[180px_1fr] items-start gap-3"
+				title={summary.submittedAt
+					? 'When the STB delivered this result'
+					: 'Older client did not send submittedAt; falling back to received_at (request arrival time)'}
+			>
+				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">received</dt>
+				<dd>
+					{formatAbsolute(summary.submittedAt ?? summary.receivedAt)}
+					{#if summary.queueDelaySeconds != null && summary.queueDelaySeconds > 0}
+						<span class="ml-2 text-xs text-muted">
+							({humanizeDelay(summary.queueDelaySeconds)} after completion)
+						</span>
+					{:else if !summary.submittedAt}
+						<span class="ml-2 text-xs text-muted">(legacy client; received_at fallback)</span>
+					{/if}
+				</dd>
 			</div>
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
 				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">payload_hash</dt>
