@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import Section from '$lib/components/Section.svelte';
-	import { formatAbsolute } from '$lib/format';
+	import LocalTime from '$lib/components/LocalTime.svelte';
 
 	let { data } = $props();
 </script>
@@ -80,7 +80,7 @@
 							{/if}
 						</td>
 						<td class="px-4 py-2.5 text-xs text-muted">
-							{v.publishedAt ? formatAbsolute(v.publishedAt) : '—'}
+							<LocalTime iso={v.publishedAt} />
 						</td>
 					</tr>
 				{/each}

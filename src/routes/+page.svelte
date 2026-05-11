@@ -6,7 +6,8 @@
 	import QueuedBadge from '$lib/components/QueuedBadge.svelte';
 	import TierDistributionChart from '$lib/components/charts/TierDistributionChart.svelte';
 	import ThroughputChart from '$lib/components/charts/ThroughputChart.svelte';
-	import { formatAbsolute, formatMbps, formatMs, humanizeDelay, shortId } from '$lib/format';
+	import { formatMbps, formatMs, humanizeDelay, shortId } from '$lib/format';
+	import LocalTime from '$lib/components/LocalTime.svelte';
 
 	let { data } = $props();
 	const TIERS = ['uhd_hdr', 'uhd', 'hd', 'sd', 'none'];
@@ -120,7 +121,7 @@
 								)}
 							</span>
 							<span class="ml-auto text-xs text-muted">
-								{formatAbsolute(c.completedAt)}
+								<LocalTime iso={c.completedAt} />
 							</span>
 							<span
 								class="text-muted transition-colors group-hover:text-pink-500"

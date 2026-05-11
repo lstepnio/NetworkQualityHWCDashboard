@@ -14,15 +14,46 @@ export function formatRelative(iso: string): string {
 	return formatDistanceToNow(new Date(iso), { addSuffix: true });
 }
 
-export function formatAbsolute(iso: string): string {
-	return new Date(iso).toLocaleString(undefined, {
-		year: 'numeric',
-		month: 'short',
-		day: '2-digit',
-		hour: '2-digit',
-		minute: '2-digit',
-		second: '2-digit'
-	});
+const ABSOLUTE_OPTS: Intl.DateTimeFormatOptions = {
+	year: 'numeric',
+	month: 'short',
+	day: '2-digit',
+	hour: '2-digit',
+	minute: '2-digit',
+	second: '2-digit'
+};
+
+/**
+ * Render a timestamp deterministically. SSR uses UTC so server and client
+ * agree at hydration; the <LocalTime> component swaps in the browser's
+ * local TZ after mount. Pass `timeZone` to force a specific zone.
+ */
+export function formatAbsolute(iso: string, timeZone: string = 'UTC'): string {
+	const d = new Date(iso);
+	const formatted = new Intl.DateTimeFormat(undefined, {
+		...ABSOLUTE_OPTS,
+		timeZone
+	}).format(d);
+	const abbr = tzAbbr(d, timeZone);
+	return abbr ? `${formatted} ${abbr}` : formatted;
+}
+
+/** Short TZ abbreviation (e.g. "UTC", "CDT") for the given instant and zone. */
+export function tzAbbr(date: Date, timeZone: string): string {
+	const parts = new Intl.DateTimeFormat('en-US', {
+		timeZone,
+		timeZoneName: 'short'
+	}).formatToParts(date);
+	return parts.find((p) => p.type === 'timeZoneName')?.value ?? '';
+}
+
+/** Resolve the IANA name of the browser's local TZ (e.g. "America/Chicago"). */
+export function localTimeZone(): string {
+	try {
+		return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+	} catch {
+		return 'UTC';
+	}
 }
 
 export function shortId(id: string): string {

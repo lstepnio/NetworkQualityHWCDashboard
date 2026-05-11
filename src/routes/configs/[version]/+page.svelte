@@ -3,7 +3,7 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import JsonBlock from '$lib/components/JsonBlock.svelte';
-	import { formatAbsolute } from '$lib/format';
+	import LocalTime from '$lib/components/LocalTime.svelte';
 
 	let { data, form } = $props();
 	let activating = $state(false);
@@ -32,7 +32,7 @@
 			{/if}
 			<span>schemaVersion {c.schemaVersion}</span>
 			<span class="text-muted">·</span>
-			<span>created {formatAbsolute(c.createdAt)}</span>
+			<span>created <LocalTime iso={c.createdAt} /></span>
 		</span>
 	{/snippet}
 	{#snippet actions()}

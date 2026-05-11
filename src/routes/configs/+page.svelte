@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import Section from '$lib/components/Section.svelte';
-	import { formatAbsolute } from '$lib/format';
+	import LocalTime from '$lib/components/LocalTime.svelte';
 
 	let { data } = $props();
 </script>
@@ -65,7 +65,7 @@
 								</span>
 							{/if}
 						</td>
-						<td class="px-4 py-2.5 text-xs text-muted">{formatAbsolute(c.createdAt)}</td>
+						<td class="px-4 py-2.5 text-xs text-muted"><LocalTime iso={c.createdAt} /></td>
 					</tr>
 				{/each}
 				{#if data.configs.items.length === 0}

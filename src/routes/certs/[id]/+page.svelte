@@ -5,7 +5,8 @@
 	import TierBadge from '$lib/components/TierBadge.svelte';
 	import QueuedBadge from '$lib/components/QueuedBadge.svelte';
 	import JsonBlock from '$lib/components/JsonBlock.svelte';
-	import { formatAbsolute, formatMbps, formatMs, humanizeDelay, shortId } from '$lib/format';
+	import { formatMbps, formatMs, humanizeDelay, shortId } from '$lib/format';
+	import LocalTime from '$lib/components/LocalTime.svelte';
 
 	let { data } = $props();
 	const summary = $derived(data.detail.summary);
@@ -15,7 +16,7 @@
 	{#snippet subtitle()}
 		<span class="flex flex-wrap items-center gap-3">
 			<TierBadge tier={summary.achievedTier} />
-			<span>Certified {formatAbsolute(summary.completedAt)}</span>
+			<span>Certified <LocalTime iso={summary.completedAt} /></span>
 			<QueuedBadge delaySeconds={summary.queueDelaySeconds} />
 		</span>
 	{/snippet}
@@ -85,15 +86,15 @@
 			</div>
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
 				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">started_at</dt>
-				<dd>{formatAbsolute(summary.startedAt)}</dd>
+				<dd><LocalTime iso={summary.startedAt} /></dd>
 			</div>
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
 				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">completed_at</dt>
-				<dd>{formatAbsolute(summary.completedAt)}</dd>
+				<dd><LocalTime iso={summary.completedAt} /></dd>
 			</div>
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
 				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">enqueued_at</dt>
-				<dd>{summary.enqueuedAt ? formatAbsolute(summary.enqueuedAt) : '—'}</dd>
+				<dd><LocalTime iso={summary.enqueuedAt} /></dd>
 			</div>
 			<div
 				class="grid grid-cols-[180px_1fr] items-start gap-3"
@@ -103,7 +104,7 @@
 			>
 				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">received</dt>
 				<dd>
-					{formatAbsolute(summary.submittedAt ?? summary.receivedAt)}
+					<LocalTime iso={summary.submittedAt ?? summary.receivedAt} />
 					{#if summary.queueDelaySeconds != null && summary.queueDelaySeconds > 0}
 						<span class="ml-2 text-xs text-muted">
 							({humanizeDelay(summary.queueDelaySeconds)} after completion)

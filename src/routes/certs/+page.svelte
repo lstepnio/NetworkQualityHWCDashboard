@@ -4,7 +4,8 @@
 	import Section from '$lib/components/Section.svelte';
 	import TierBadge from '$lib/components/TierBadge.svelte';
 	import QueuedBadge from '$lib/components/QueuedBadge.svelte';
-	import { formatAbsolute, formatMbps, formatMs, shortId } from '$lib/format';
+	import { formatMbps, formatMs, shortId } from '$lib/format';
+	import LocalTime from '$lib/components/LocalTime.svelte';
 
 	let { data } = $props();
 
@@ -183,7 +184,7 @@
 				{#each data.certs.items as c (c.certificationId)}
 					<tr class="border-b border-border transition-colors hover:bg-white/[0.025]">
 						<td class="px-4 py-2.5 text-xs whitespace-nowrap">
-							<span class="text-muted">{formatAbsolute(c.completedAt)}</span>
+							<LocalTime iso={c.completedAt} class="text-muted" />
 						</td>
 						<td class="px-4 py-2.5">
 							<a

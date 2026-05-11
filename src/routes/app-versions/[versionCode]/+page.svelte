@@ -3,7 +3,8 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import JsonBlock from '$lib/components/JsonBlock.svelte';
-	import { formatAbsolute, formatBytes } from '$lib/format';
+	import { formatBytes } from '$lib/format';
+	import LocalTime from '$lib/components/LocalTime.svelte';
 
 	let { data, form } = $props();
 	let activating = $state(false);
@@ -37,7 +38,7 @@
 			<span class="tabular-nums">min ≥ {v.minRequiredVersionCode}</span>
 			{#if v.publishedAt}
 				<span class="text-muted">·</span>
-				<span>published {formatAbsolute(v.publishedAt)}</span>
+				<span>published <LocalTime iso={v.publishedAt} /></span>
 			{/if}
 		</span>
 	{/snippet}
