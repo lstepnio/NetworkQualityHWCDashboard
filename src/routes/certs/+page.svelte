@@ -171,6 +171,7 @@
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">ID</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Device</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">HSN</th>
+					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">ISP</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Tier</th>
 					<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Down</th>
 					<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Up</th>
@@ -224,6 +225,18 @@
 										{c.hsn}
 									</a>
 								{/if}
+							{:else}
+								<span class="text-muted">—</span>
+							{/if}
+						</td>
+						<td class="px-4 py-2.5 text-xs">
+							{#if c.ispName}
+								<span class="text-foreground">{c.ispName.split(',')[0]}</span>
+								{#if c.ispAsn}
+									<span class="ml-1 font-mono text-[10px] text-muted">AS{c.ispAsn}</span>
+								{/if}
+							{:else if c.ispAsn}
+								<span class="font-mono text-muted">AS{c.ispAsn}</span>
 							{:else}
 								<span class="text-muted">—</span>
 							{/if}

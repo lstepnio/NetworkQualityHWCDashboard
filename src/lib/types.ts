@@ -19,7 +19,10 @@ export type CertSummary = {
 	downloadSteadyMbps?: number;
 	uploadSteadyMbps?: number;
 	latencyMedianMs?: number;
-	publicIpHash?: string; // never the raw IP; backend hashes search inputs
+	publicIpHash?: string; // never the raw IP; backend hashes search inputs. STB-reported via STUN.
+	requestIpHash?: string; // backend-observed source IP of the POST request, same hash family as publicIpHash
+	ispAsn?: number; // Cymru lookup of the request-source IP at ingest
+	ispName?: string; // Cymru's registered name for the AS (e.g. "HOTWIRE-COMMUNICATIONS, US")
 	enqueuedAt?: string;
 	submittedAt?: string;
 	// submittedAt - completedAt in seconds, clamped >= 0. Omitted by the
