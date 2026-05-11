@@ -74,10 +74,38 @@
 			</div>
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
 				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">
-					publicIp (hashed)
+					publicIp (STB, hashed)
 				</dt>
 				<dd class="font-mono text-xs break-all">
 					{summary.publicIpHash ?? '—'}
+				</dd>
+			</div>
+			<div class="grid grid-cols-[180px_1fr] items-start gap-3"
+				title="Hashed source IP observed at POST time. The dashboard search prefers this over the STB-reported publicIp.">
+				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">
+					request IP (hashed)
+				</dt>
+				<dd class="font-mono text-xs break-all">
+					{summary.requestIpHash ?? '—'}
+					{#if summary.requestIpHash && summary.publicIpHash && summary.requestIpHash !== summary.publicIpHash}
+						<span class="ml-2 inline-flex items-center rounded-md border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium tracking-[0.08em] text-amber-400 uppercase">
+							mismatch
+						</span>
+					{/if}
+				</dd>
+			</div>
+			<div class="grid grid-cols-[180px_1fr] items-start gap-3"
+				title="ISP behind the request source IP (Cymru DNS lookup at ingest).">
+				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">isp</dt>
+				<dd class="text-xs">
+					{#if summary.ispName || summary.ispAsn}
+						<span class="text-foreground">{summary.ispName ?? '—'}</span>
+						{#if summary.ispAsn}
+							<span class="ml-2 font-mono text-muted">AS{summary.ispAsn}</span>
+						{/if}
+					{:else}
+						—
+					{/if}
 				</dd>
 			</div>
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
