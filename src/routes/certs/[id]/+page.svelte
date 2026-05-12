@@ -3,13 +3,29 @@
 	import Kpi from '$lib/components/Kpi.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import TierBadge from '$lib/components/TierBadge.svelte';
+	import WifiBadge from '$lib/components/WifiBadge.svelte';
 	import QueuedBadge from '$lib/components/QueuedBadge.svelte';
 	import JsonBlock from '$lib/components/JsonBlock.svelte';
 	import { formatMbps, formatMs, humanizeDelay, shortId } from '$lib/format';
 	import LocalTime from '$lib/components/LocalTime.svelte';
 
+	type WifiLink = {
+		rating?: string;
+		rssiDbm?: number;
+		band?: string;
+		linkSpeedMbps?: number;
+		maxSupportedMbps?: number;
+		advice?: string;
+		rateAdaptationDegraded?: boolean;
+	};
+
 	let { data } = $props();
 	const summary = $derived(data.detail.summary);
+	// The payload is the raw CertificationResult — wifiLink lives under
+	// result.wifiLink. Null for Ethernet runs and older clients.
+	const wifiLink = $derived(
+		(data.detail.payload?.result as { wifiLink?: WifiLink } | undefined)?.wifiLink
+	);
 </script>
 
 <PageHeader eyebrow="Certification" title="{shortId(summary.certificationId)}…">
@@ -33,14 +49,33 @@
 </div>
 
 <div class="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
-	<Kpi label="Widevine" value={summary.widevineLevel ?? '—'} />
+	<Kpi label="WiFi health">
+		{#snippet value()}
+			<div class="flex items-center gap-2">
+				<WifiBadge rating={wifiLink?.rating} />
+				{#if wifiLink?.rssiDbm != null}
+					<span class="tabular-nums text-[14px] font-normal text-muted">{wifiLink.rssiDbm} dBm</span>
+				{/if}
+			</div>
+		{/snippet}
+		{#snippet hint()}
+			{#if wifiLink?.advice}
+				{wifiLink.advice}
+			{:else if !wifiLink}
+				No WiFi data (Ethernet run or older client)
+			{/if}
+		{/snippet}
+	</Kpi>
+	<Kpi
+		label="WiFi link rate"
+		value={wifiLink?.linkSpeedMbps != null
+			? `${wifiLink.linkSpeedMbps} / ${wifiLink.maxSupportedMbps ?? '?'} Mbps`
+			: '—'}
+		hint={wifiLink?.band ? wifiLink.band.replace(/^BAND_/, '').replace(/_/g, ' ') : undefined}
+	/>
 	<Kpi
 		label="Display max"
 		value={summary.displayMaxHeight ? `${summary.displayMaxHeight}p` : '—'}
-	/>
-	<Kpi
-		label="HDR support"
-		value={summary.hdrTypes.length === 0 ? 'none' : summary.hdrTypes.join(', ')}
 	/>
 	<Kpi label="Thermal" value={summary.thermalStatus ?? '—'} />
 </div>

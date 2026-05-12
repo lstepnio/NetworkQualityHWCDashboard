@@ -19,6 +19,11 @@ export type CertSummary = {
 	downloadSteadyMbps?: number;
 	uploadSteadyMbps?: number;
 	latencyMedianMs?: number;
+	// WiFi health bucket the Android client computes (STRONG / GOOD /
+	// MARGINAL / WEAK). Extracted backend-side from payload.result.wifiLink.
+	// Null on Ethernet or older clients.
+	wifiRating?: string;
+	wifiRssiDbm?: number;
 	publicIpHash?: string; // never the raw IP; backend hashes search inputs
 	enqueuedAt?: string;
 	submittedAt?: string;
@@ -63,6 +68,11 @@ export type CertFilters = {
 	queuedOnly?: boolean;
 	from?: string;
 	to?: string;
+	// Whitelisted backend keys: completed | received | tier | download |
+	// upload | latency | wifi | device | config | hsn. Unknown keys are
+	// silently ignored by the backend (falls back to completed_at).
+	sort?: string;
+	dir?: 'asc' | 'desc';
 	limit?: number;
 	offset?: number;
 };

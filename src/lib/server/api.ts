@@ -54,6 +54,8 @@ export function listCerts(filters: CertFilters = {}): Promise<CertList> {
 			queuedOnly: filters.queuedOnly ? 'true' : undefined,
 			from: filters.from,
 			to: filters.to,
+			sort: filters.sort,
+			dir: filters.dir,
 			limit: filters.limit,
 			offset: filters.offset
 		})}`

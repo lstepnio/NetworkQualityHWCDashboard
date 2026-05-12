@@ -3,6 +3,7 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import TierBadge from '$lib/components/TierBadge.svelte';
+	import WifiBadge from '$lib/components/WifiBadge.svelte';
 	import QueuedBadge from '$lib/components/QueuedBadge.svelte';
 	import { formatMbps, formatMs, shortId } from '$lib/format';
 	import LocalTime from '$lib/components/LocalTime.svelte';
@@ -29,7 +30,7 @@
 	let showingFrom = $derived(data.certs.total === 0 ? 0 : data.offset + 1);
 	let showingTo = $derived(Math.min(data.offset + data.certs.items.length, data.certs.total));
 
-	function buildHref(newOffset: number): string {
+	function baseParams(): URLSearchParams {
 		const p = new URLSearchParams();
 		if (data.filters.tier) p.set('tier', data.filters.tier);
 		if (data.filters.deviceId) p.set('deviceId', data.filters.deviceId);
@@ -38,10 +39,39 @@
 		if (data.filters.publicIp) p.set('publicIp', data.filters.publicIp);
 		if (data.filters.queuedOnly) p.set('queuedOnly', 'true');
 		if (data.limit !== 50) p.set('limit', String(data.limit));
+		return p;
+	}
+
+	function buildHref(newOffset: number): string {
+		const p = baseParams();
+		if (data.sort) p.set('sort', data.sort);
+		if (data.dir) p.set('dir', data.dir);
 		if (newOffset !== 0) p.set('offset', String(newOffset));
 		const qs = p.toString();
 		return qs ? `/certs?${qs}` : '/certs';
 	}
+
+	// Toggle order on the same column, otherwise switch column and start
+	// at desc — most users want "biggest/most-recent first" by default.
+	function sortHref(col: string): string {
+		const p = baseParams();
+		let nextDir: 'asc' | 'desc' = 'desc';
+		if (data.sort === col && data.dir !== 'asc') nextDir = 'asc';
+		p.set('sort', col);
+		p.set('dir', nextDir);
+		return `/certs?${p.toString()}`;
+	}
+
+	function sortArrow(col: string): string {
+		if (data.sort !== col) return '';
+		return data.dir === 'asc' ? ' ↑' : ' ↓';
+	}
+
+	const thLeft =
+		'px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase';
+	const thRight =
+		'px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase';
+	const sortLink = 'inline-flex items-center gap-1 transition-colors hover:text-foreground';
 
 	let hasPrev = $derived(data.offset > 0);
 	let hasNext = $derived(data.offset + data.limit < data.certs.total);
@@ -115,12 +145,10 @@
 	{#if data.filters.queuedOnly}
 		<a
 			href={(() => {
-				const p = new URLSearchParams();
-				if (data.filters.tier) p.set('tier', data.filters.tier);
-				if (data.filters.deviceId) p.set('deviceId', data.filters.deviceId);
-				if (data.filters.configVersion) p.set('configVersion', data.filters.configVersion);
-				if (data.filters.hsn) p.set('hsn', data.filters.hsn);
-				if (data.filters.publicIp) p.set('publicIp', data.filters.publicIp);
+				const p = baseParams();
+				p.delete('queuedOnly');
+				if (data.sort) p.set('sort', data.sort);
+				if (data.dir) p.set('dir', data.dir);
 				const qs = p.toString();
 				return qs ? `/certs?${qs}` : '/certs';
 			})()}
@@ -132,13 +160,10 @@
 	{:else}
 		<a
 			href={(() => {
-				const p = new URLSearchParams();
-				if (data.filters.tier) p.set('tier', data.filters.tier);
-				if (data.filters.deviceId) p.set('deviceId', data.filters.deviceId);
-				if (data.filters.configVersion) p.set('configVersion', data.filters.configVersion);
-				if (data.filters.hsn) p.set('hsn', data.filters.hsn);
-				if (data.filters.publicIp) p.set('publicIp', data.filters.publicIp);
+				const p = baseParams();
 				p.set('queuedOnly', 'true');
+				if (data.sort) p.set('sort', data.sort);
+				if (data.dir) p.set('dir', data.dir);
 				return `/certs?${p.toString()}`;
 			})()}
 			class="text-xs text-muted hover:text-foreground"
@@ -167,17 +192,17 @@
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="hairline">
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Certified</th>
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">ID</th>
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Device</th>
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">HSN</th>
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Tier</th>
-					<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Down</th>
-					<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Up</th>
-					<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Latency</th>
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Widevine</th>
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Display</th>
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Config</th>
+					<th class={thLeft}><a href={sortHref('completed')} class={sortLink}>Certified{sortArrow('completed')}</a></th>
+					<th class={thLeft}>ID</th>
+					<th class={thLeft}><a href={sortHref('device')} class={sortLink}>Device{sortArrow('device')}</a></th>
+					<th class={thLeft}><a href={sortHref('hsn')} class={sortLink}>HSN{sortArrow('hsn')}</a></th>
+					<th class={thLeft}><a href={sortHref('tier')} class={sortLink}>Tier{sortArrow('tier')}</a></th>
+					<th class={thRight}><a href={sortHref('download')} class={sortLink}>Down{sortArrow('download')}</a></th>
+					<th class={thRight}><a href={sortHref('upload')} class={sortLink}>Up{sortArrow('upload')}</a></th>
+					<th class={thRight}><a href={sortHref('latency')} class={sortLink}>Latency{sortArrow('latency')}</a></th>
+					<th class={thLeft}><a href={sortHref('wifi')} class={sortLink}>WiFi{sortArrow('wifi')}</a></th>
+					<th class={thLeft}>Display</th>
+					<th class={thLeft}><a href={sortHref('config')} class={sortLink}>Config{sortArrow('config')}</a></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -240,11 +265,20 @@
 						<td class="tabular-nums px-4 py-2.5 text-right text-xs">
 							{formatMs(c.latencyMedianMs)}
 						</td>
-						<td class="px-4 py-2.5 text-xs">{c.widevineLevel ?? '—'}</td>
+						<td class="px-4 py-2.5">
+							{#if c.wifiRating || c.wifiRssiDbm != null}
+								<div class="flex items-center gap-2">
+									<WifiBadge rating={c.wifiRating} />
+									{#if c.wifiRssiDbm != null}
+										<span class="tabular-nums text-[11px] text-muted">{c.wifiRssiDbm} dBm</span>
+									{/if}
+								</div>
+							{:else}
+								<span class="text-xs text-muted">—</span>
+							{/if}
+						</td>
 						<td class="px-4 py-2.5 text-xs">
-							{c.displayMaxHeight ? `${c.displayMaxHeight}p` : '—'}{c.hdrTypes && c.hdrTypes.length > 0
-								? ' · HDR'
-								: ''}
+							{c.displayMaxHeight ? `${c.displayMaxHeight}p` : '—'}
 						</td>
 						<td class="px-4 py-2.5 font-mono text-xs text-muted">{c.configVersion ?? '—'}</td>
 					</tr>
