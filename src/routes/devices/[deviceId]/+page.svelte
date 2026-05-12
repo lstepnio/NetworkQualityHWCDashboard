@@ -8,6 +8,7 @@
 	import ThroughputChart from '$lib/components/charts/ThroughputChart.svelte';
 	import { formatMbps, formatMs, shortId } from '$lib/format';
 	import LocalTime from '$lib/components/LocalTime.svelte';
+	import TzToggle from '$lib/components/TzToggle.svelte';
 
 	const TIERS = ['uhd_hdr', 'uhd', 'hd', 'sd', 'none'];
 
@@ -79,7 +80,7 @@
 			<table class="w-full text-sm">
 				<thead>
 					<tr class="hairline">
-						<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">When</th>
+						<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">When<TzToggle /></th>
 						<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Tier</th>
 						<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Down</th>
 						<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Up</th>

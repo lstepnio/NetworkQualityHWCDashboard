@@ -4,6 +4,7 @@
 	import TierBadge from '$lib/components/TierBadge.svelte';
 	import { formatMbps, shortId } from '$lib/format';
 	import LocalTime from '$lib/components/LocalTime.svelte';
+	import TzToggle from '$lib/components/TzToggle.svelte';
 	import type { CertSummary } from '$lib/types';
 
 	let { data } = $props();
@@ -83,7 +84,7 @@
 					<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Runs</th>
 					<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Avg ↓</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Latest tier</th>
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Last seen</th>
+					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Last seen<TzToggle /></th>
 				</tr>
 			</thead>
 			<tbody>

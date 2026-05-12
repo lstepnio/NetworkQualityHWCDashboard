@@ -2,6 +2,7 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import LocalTime from '$lib/components/LocalTime.svelte';
+	import TzToggle from '$lib/components/TzToggle.svelte';
 
 	let { data } = $props();
 </script>
@@ -31,7 +32,7 @@
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Version</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Schema</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">State</th>
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Created</th>
+					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Created<TzToggle /></th>
 				</tr>
 			</thead>
 			<tbody>
