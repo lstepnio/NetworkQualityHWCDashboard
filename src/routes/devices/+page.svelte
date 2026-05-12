@@ -9,40 +9,65 @@
 	let { data } = $props();
 
 	type Rollup = {
-		deviceId: string;
+		// The drill-down URL value. HSN when present (one physical STB
+		// across all app reinstalls); deviceId only as a fallback for
+		// legacy null-HSN rows that can't be joined any other way.
+		identity: string;
 		hsn?: string;
 		runs: number;
+		// distinct app installs (deviceIds) under this HSN. >1 means
+		// the box was reinstalled / data-wiped at some point.
+		installs: number;
 		latestTier: string;
 		latestReceivedAt: string;
 		avgDownload?: number;
 	};
 
+	function rollupKey(c: CertSummary): string {
+		return c.hsn ?? c.deviceId;
+	}
+
 	function rollup(items: CertSummary[]): Rollup[] {
 		const byDevice = new Map<string, Rollup>();
 		const downloadAvgs = new Map<string, { sum: number; n: number }>();
+		const installIds = new Map<string, Set<string>>();
 		for (const c of items) {
-			const existing = byDevice.get(c.deviceId);
+			const key = rollupKey(c);
+			const existing = byDevice.get(key);
 			if (!existing) {
-				byDevice.set(c.deviceId, {
-					deviceId: c.deviceId,
+				byDevice.set(key, {
+					identity: key,
 					hsn: c.hsn,
 					runs: 1,
+					installs: 1,
 					latestTier: c.achievedTier,
 					latestReceivedAt: c.receivedAt
 				});
 			} else {
 				existing.runs += 1;
+				// Keep the latest tier/timestamp (items arrive desc).
+				if (new Date(c.receivedAt) > new Date(existing.latestReceivedAt)) {
+					existing.latestReceivedAt = c.receivedAt;
+					existing.latestTier = c.achievedTier;
+				}
 			}
 			if (c.downloadSteadyMbps != null) {
-				const acc = downloadAvgs.get(c.deviceId) ?? { sum: 0, n: 0 };
+				const acc = downloadAvgs.get(key) ?? { sum: 0, n: 0 };
 				acc.sum += c.downloadSteadyMbps;
 				acc.n += 1;
-				downloadAvgs.set(c.deviceId, acc);
+				downloadAvgs.set(key, acc);
 			}
+			const ids = installIds.get(key) ?? new Set<string>();
+			ids.add(c.deviceId);
+			installIds.set(key, ids);
 		}
-		for (const [id, acc] of downloadAvgs) {
-			const r = byDevice.get(id);
+		for (const [k, acc] of downloadAvgs) {
+			const r = byDevice.get(k);
 			if (r) r.avgDownload = acc.sum / acc.n;
+		}
+		for (const [k, ids] of installIds) {
+			const r = byDevice.get(k);
+			if (r) r.installs = ids.size;
 		}
 		return [...byDevice.values()].sort(
 			(a, b) => new Date(b.latestReceivedAt).getTime() - new Date(a.latestReceivedAt).getTime()
@@ -74,13 +99,13 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each devices as d (d.deviceId)}
+				{#each devices as d (d.identity)}
 					<tr class="border-b border-border transition-colors hover:bg-white/[0.025]">
 						<td class="px-4 py-2.5">
 							{#if d.hsn}
 								{#if d.hsn.length === 64 && /^[0-9a-f]+$/.test(d.hsn)}
 									<a
-										href="/devices/{d.deviceId}"
+										href="/devices/{d.identity}"
 										class="font-mono text-[13px] text-muted/70 transition-colors hover:text-pink-500"
 										title="Legacy pre-policy hashed HSN"
 									>
@@ -88,15 +113,20 @@
 									</a>
 								{:else}
 									<a
-										href="/devices/{d.deviceId}"
+										href="/devices/{d.identity}"
 										class="font-mono text-[13px] text-foreground transition-colors hover:text-pink-500"
 									>
 										{d.hsn}
 									</a>
 								{/if}
+								{#if d.installs > 1}
+									<span class="ml-2 text-[10.5px] text-muted" title="{d.installs} app installs (deviceIds) seen for this box">
+										· {d.installs} installs
+									</span>
+								{/if}
 							{:else}
 								<a
-									href="/devices/{d.deviceId}"
+									href="/devices/{d.identity}"
 									class="text-[13px] text-muted/70 italic transition-colors hover:text-pink-500"
 									title="Older device — HSN not captured"
 								>

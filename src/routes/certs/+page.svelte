@@ -223,7 +223,7 @@
 							{#if c.hsn}
 								{#if c.hsn.length === 64 && /^[0-9a-f]+$/.test(c.hsn)}
 									<a
-										href="/devices/{c.deviceId}"
+										href="/devices/{c.hsn ?? c.deviceId}"
 										class="font-mono text-xs text-muted/70 transition-colors hover:text-pink-500"
 										title="Legacy pre-policy hashed HSN — click to open device"
 									>
@@ -231,7 +231,7 @@
 									</a>
 								{:else}
 									<a
-										href="/devices/{c.deviceId}"
+										href="/devices/{c.hsn ?? c.deviceId}"
 										class="font-mono text-xs text-foreground transition-colors hover:text-pink-500"
 									>
 										{c.hsn}
@@ -239,7 +239,7 @@
 								{/if}
 							{:else}
 								<a
-									href="/devices/{c.deviceId}"
+									href="/devices/{c.hsn ?? c.deviceId}"
 									class="text-xs text-muted/70 italic transition-colors hover:text-pink-500"
 									title="Older device — HSN not captured"
 								>

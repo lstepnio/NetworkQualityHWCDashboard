@@ -88,7 +88,7 @@
 				<dd class="font-mono text-xs break-all">
 					{#if summary.hsn}
 						<a
-							href="/devices/{summary.deviceId}"
+							href="/devices/{summary.hsn ?? summary.deviceId}"
 							class="text-foreground transition-colors hover:text-pink-500"
 						>
 							{summary.hsn} ↗
@@ -98,7 +98,7 @@
 						{/if}
 					{:else}
 						<a
-							href="/devices/{summary.deviceId}"
+							href="/devices/{summary.hsn ?? summary.deviceId}"
 							class="italic text-muted transition-colors hover:text-pink-500"
 						>
 							Legacy device — HSN not captured ↗
