@@ -7,6 +7,7 @@
 	import QueuedBadge from '$lib/components/QueuedBadge.svelte';
 	import { formatMbps, formatMs, shortId } from '$lib/format';
 	import LocalTime from '$lib/components/LocalTime.svelte';
+	import TzToggle from '$lib/components/TzToggle.svelte';
 
 	let { data } = $props();
 
@@ -192,7 +193,9 @@
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="hairline">
-					<th class={thLeft}><a href={sortHref('completed')} class={sortLink}>Certified{sortArrow('completed')}</a></th>
+					<th class={thLeft}>
+							<a href={sortHref('completed')} class={sortLink}>Certified{sortArrow('completed')}</a><TzToggle />
+						</th>
 					<th class={thLeft}><a href={sortHref('hsn')} class={sortLink}>HSN{sortArrow('hsn')}</a></th>
 					<th class={thLeft}><a href={sortHref('tier')} class={sortLink}>Tier{sortArrow('tier')}</a></th>
 					<th class={thRight}><a href={sortHref('download')} class={sortLink}>Down{sortArrow('download')}</a></th>
