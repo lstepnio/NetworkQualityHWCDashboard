@@ -24,7 +24,8 @@
 			data.filters.configVersion && { k: 'configVersion', v: data.filters.configVersion },
 			data.filters.hsn && { k: 'hsn', v: data.filters.hsn },
 			data.filters.publicIp && { k: 'publicIp', v: data.filters.publicIp },
-			data.filters.queuedOnly && { k: 'queuedOnly', v: 'true' }
+			data.filters.queuedOnly && { k: 'queuedOnly', v: 'true' },
+			data.filters.dnsFlagged && { k: 'dnsFlagged', v: 'true' }
 		].filter(Boolean) as { k: string; v: string }[]
 	);
 
@@ -39,6 +40,7 @@
 		if (data.filters.hsn) p.set('hsn', data.filters.hsn);
 		if (data.filters.publicIp) p.set('publicIp', data.filters.publicIp);
 		if (data.filters.queuedOnly) p.set('queuedOnly', 'true');
+		if (data.filters.dnsFlagged) p.set('dnsFlagged', 'true');
 		if (data.limit !== 50) p.set('limit', String(data.limit));
 		return p;
 	}
@@ -140,6 +142,9 @@
 	{#if data.filters.queuedOnly}
 		<input type="hidden" name="queuedOnly" value="true" />
 	{/if}
+	{#if data.filters.dnsFlagged}
+		<input type="hidden" name="dnsFlagged" value="true" />
+	{/if}
 </form>
 
 <div class="mb-4 flex items-center gap-3 text-sm">
@@ -172,6 +177,35 @@
 			Show only queue-delayed (&gt; 5 min)
 		</a>
 	{/if}
+	{#if data.filters.dnsFlagged}
+		<a
+			href={(() => {
+				const p = baseParams();
+				p.delete('dnsFlagged');
+				if (data.sort) p.set('sort', data.sort);
+				if (data.dir) p.set('dir', data.dir);
+				const qs = p.toString();
+				return qs ? `/certs?${qs}` : '/certs';
+			})()}
+			class="inline-flex items-center gap-2 rounded-md border border-pink-500/30 bg-pink-500/15 px-3 py-1.5 text-xs font-medium text-pink-200 transition-colors hover:bg-pink-500/20"
+		>
+			<span class="size-1.5 rounded-full bg-pink-400"></span>
+			Showing DNS-flagged only — click to clear
+		</a>
+	{:else}
+		<a
+			href={(() => {
+				const p = baseParams();
+				p.set('dnsFlagged', 'true');
+				if (data.sort) p.set('sort', data.sort);
+				if (data.dir) p.set('dir', data.dir);
+				return `/certs?${p.toString()}`;
+			})()}
+			class="text-xs text-muted hover:text-foreground"
+		>
+			Show only DNS-flagged
+		</a>
+	{/if}
 </div>
 
 {#if pills.length > 0}
@@ -202,6 +236,7 @@
 					<th class={thRight}><a href={sortHref('upload')} class={sortLink}>Up{sortArrow('upload')}</a></th>
 					<th class={thRight}><a href={sortHref('latency')} class={sortLink}>Latency{sortArrow('latency')}</a></th>
 					<th class={thLeft}><a href={sortHref('wifi')} class={sortLink}>WiFi{sortArrow('wifi')}</a></th>
+					<th class={thLeft}>DNS</th>
 					<th class={thLeft}>Display</th>
 					<th class={thLeft}><a href={sortHref('config')} class={sortLink}>Config{sortArrow('config')}</a></th>
 				</tr>
@@ -274,6 +309,25 @@
 								<span class="text-xs text-muted">—</span>
 							{/if}
 						</td>
+						<td class="px-4 py-2.5">
+							{#if c.dnsPreferred === true}
+								<span
+									class="inline-flex items-center rounded-md border border-white/15 bg-white/5 px-1.5 py-0.5 text-[11px] font-medium text-muted"
+									title="All resolvers matched the preferred set"
+								>
+									✓
+								</span>
+							{:else if c.dnsPreferred === false}
+								<span
+									class="inline-flex items-center gap-1 rounded-md border border-pink-500/30 bg-pink-500/15 px-1.5 py-0.5 text-[11px] font-medium text-pink-200"
+									title="Click for non-preferred servers"
+								>
+									✗ flagged
+								</span>
+							{:else}
+								<span class="text-xs text-muted">—</span>
+							{/if}
+						</td>
 						<td class="px-4 py-2.5 text-xs">
 							{c.displayMaxHeight ? `${c.displayMaxHeight}p` : '—'}
 						</td>
@@ -282,7 +336,7 @@
 				{/each}
 				{#if data.certs.items.length === 0}
 					<tr>
-						<td colspan="9" class="px-4 py-12 text-center text-muted">No certifications match.</td>
+						<td colspan="10" class="px-4 py-12 text-center text-muted">No certifications match.</td>
 					</tr>
 				{/if}
 			</tbody>

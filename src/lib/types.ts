@@ -24,6 +24,11 @@ export type CertSummary = {
 	// Null on Ethernet or older clients.
 	wifiRating?: string;
 	wifiRssiDbm?: number;
+	// DNS-policy verdict (contract v2.3.0). true = all actuals matched
+	// preferred set (or vacuous empty); false = at least one non-preferred
+	// actual server; omitted when no dnsPolicy was active at ingest or the
+	// payload predates v2.3.0.
+	dnsPreferred?: boolean;
 	publicIp?: string; // plaintext for new rows; legacy rows (ingested before backend v0.7.11) still carry the SHA-256 string
 	enqueuedAt?: string;
 	submittedAt?: string;
@@ -82,6 +87,7 @@ export type CertFilters = {
 	hsn?: string;
 	publicIp?: string;
 	queuedOnly?: boolean;
+	dnsFlagged?: boolean;
 	from?: string;
 	to?: string;
 	// Whitelisted backend keys: completed | received | tier | download |
