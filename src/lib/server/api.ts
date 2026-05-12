@@ -52,6 +52,7 @@ export function listCerts(filters: CertFilters = {}): Promise<CertList> {
 			hsn: filters.hsn,
 			publicIp: filters.publicIp,
 			queuedOnly: filters.queuedOnly ? 'true' : undefined,
+			dnsFlagged: filters.dnsFlagged ? 'true' : undefined,
 			from: filters.from,
 			to: filters.to,
 			sort: filters.sort,
