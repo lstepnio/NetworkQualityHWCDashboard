@@ -9,6 +9,16 @@
 	// On a failed submit (form set), use what the user submitted so they
 	// don't lose their edits.
 	let document = $state(form?.document ?? JSON.stringify(data.template ?? {}, null, 2));
+	// Targeting selectors. When cloning a `?from=` template we pre-fill from
+	// the source row so operators can tweak rather than re-type. The
+	// load function provides templateTargeting (may be null fields).
+	let targetManufacturer = $state(
+		form?.targetManufacturer ?? data.templateTargeting?.targetManufacturer ?? ''
+	);
+	let targetModel = $state(form?.targetModel ?? data.templateTargeting?.targetModel ?? '');
+	let targetBuildFingerprint = $state(
+		form?.targetBuildFingerprint ?? data.templateTargeting?.targetBuildFingerprint ?? ''
+	);
 	let saving = $state(false);
 
 	function bumpVersion() {
@@ -63,13 +73,72 @@
 	</div>
 {/if}
 
-<form method="POST" use:enhance={() => {
-	saving = true;
-	return async ({ update }) => {
-		await update();
-		saving = false;
-	};
-}} class="space-y-4">
+<form
+	method="POST"
+	use:enhance={() => {
+		saving = true;
+		return async ({ update }) => {
+			await update();
+			saving = false;
+		};
+	}}
+	class="space-y-4"
+>
+	<Section
+		title="Device targeting"
+		description="Optional selectors. Backend resolves the most specific match per device."
+	>
+		<div class="space-y-3">
+			<div class="grid gap-3 sm:grid-cols-2">
+				<label class="block">
+					<span class="mb-1 block text-[11px] font-medium tracking-[0.08em] text-muted uppercase">
+						Target manufacturer
+					</span>
+					<input
+						type="text"
+						name="targetManufacturer"
+						bind:value={targetManufacturer}
+						placeholder="SEI Robotics"
+						maxlength="255"
+						class="block w-full rounded-md border border-border bg-surface-2/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-pink-500/50 focus:ring-2 focus:ring-pink-500/20 focus:outline-none"
+					/>
+				</label>
+				<label class="block">
+					<span class="mb-1 block text-[11px] font-medium tracking-[0.08em] text-muted uppercase">
+						Target model
+					</span>
+					<input
+						type="text"
+						name="targetModel"
+						bind:value={targetModel}
+						placeholder="FRC1-Hotwire"
+						maxlength="255"
+						class="block w-full rounded-md border border-border bg-surface-2/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-pink-500/50 focus:ring-2 focus:ring-pink-500/20 focus:outline-none"
+					/>
+				</label>
+			</div>
+			<label class="block">
+				<span class="mb-1 block text-[11px] font-medium tracking-[0.08em] text-muted uppercase">
+					Target build fingerprint
+				</span>
+				<input
+					type="text"
+					name="targetBuildFingerprint"
+					bind:value={targetBuildFingerprint}
+					placeholder="EVOFORCE1/SEI800HW/SEI800HW:12/STTC.220803.001/1876:user/release-keys"
+					maxlength="255"
+					spellcheck="false"
+					class="block w-full rounded-md border border-border bg-surface-2/60 px-3 py-2 font-mono text-xs text-foreground placeholder:text-muted-foreground/60 focus:border-pink-500/50 focus:ring-2 focus:ring-pink-500/20 focus:outline-none"
+				/>
+			</label>
+			<p class="text-xs text-muted">
+				Leave all three blank to make this the default config that applies to any device that
+				doesn't match a more specific row. Most specific match wins: build fingerprint &gt; model
+				&gt; manufacturer &gt; default.
+			</p>
+		</div>
+	</Section>
+
 	<Section
 		title="Document"
 		description="Full CertConfig JSON. configVersion must be unique; schemaVersion >= 1."

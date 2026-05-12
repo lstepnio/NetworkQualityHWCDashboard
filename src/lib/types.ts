@@ -51,6 +51,13 @@ export type ConfigSummary = {
 	schemaVersion: number;
 	isActive: boolean;
 	createdAt: string;
+	// Per-device targeting selectors (contract v2.2.0). All three optional.
+	// When all are absent the row is the "default" catch-all. The backend
+	// resolves "most specific match wins": fingerprint > model > manufacturer
+	// > default. Existing rows created against pre-2.2.0 backends omit these.
+	targetManufacturer?: string | null;
+	targetModel?: string | null;
+	targetBuildFingerprint?: string | null;
 	document?: Record<string, unknown>;
 };
 

@@ -4,6 +4,7 @@
 	import Section from '$lib/components/Section.svelte';
 	import JsonBlock from '$lib/components/JsonBlock.svelte';
 	import LocalTime from '$lib/components/LocalTime.svelte';
+	import TargetBadges from '$lib/components/TargetBadges.svelte';
 
 	let { data, form } = $props();
 	let activating = $state(false);
@@ -33,6 +34,13 @@
 			<span>schemaVersion {c.schemaVersion}</span>
 			<span class="text-muted">·</span>
 			<span>created <LocalTime iso={c.createdAt} /></span>
+			<span class="text-muted">·</span>
+			<TargetBadges
+				manufacturer={c.targetManufacturer}
+				model={c.targetModel}
+				fingerprint={c.targetBuildFingerprint}
+				fingerprintMaxChars={48}
+			/>
 		</span>
 	{/snippet}
 	{#snippet actions()}

@@ -3,8 +3,22 @@
 	import Section from '$lib/components/Section.svelte';
 	import LocalTime from '$lib/components/LocalTime.svelte';
 	import TzToggle from '$lib/components/TzToggle.svelte';
+	import TargetBadges from '$lib/components/TargetBadges.svelte';
 
 	let { data } = $props();
+
+	// Operators usually scan for SKU-specific rows first; defaults are the
+	// catch-all. Within each group keep the backend's order (active first,
+	// then newest createdAt — that's what listConfigs returns).
+	const sortedConfigs = $derived(
+		[...data.configs.items].sort((a, b) => {
+			const aDefault =
+				!a.targetManufacturer && !a.targetModel && !a.targetBuildFingerprint ? 1 : 0;
+			const bDefault =
+				!b.targetManufacturer && !b.targetModel && !b.targetBuildFingerprint ? 1 : 0;
+			return aDefault - bDefault;
+		})
+	);
 </script>
 
 <PageHeader eyebrow="Server-driven runtime" title="Configurations">
@@ -30,13 +44,14 @@
 			<thead>
 				<tr class="hairline">
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Version</th>
+					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Target</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Schema</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">State</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Created<TzToggle /></th>
 				</tr>
 			</thead>
 			<tbody>
-				{#each data.configs.items as c (c.configVersion)}
+				{#each sortedConfigs as c (c.configVersion)}
 					<tr class="border-b border-border transition-colors hover:bg-white/[0.025]">
 						<td class="px-4 py-2.5 font-mono">
 							<a
@@ -45,6 +60,13 @@
 							>
 								{c.configVersion}
 							</a>
+						</td>
+						<td class="px-4 py-2.5">
+							<TargetBadges
+								manufacturer={c.targetManufacturer}
+								model={c.targetModel}
+								fingerprint={c.targetBuildFingerprint}
+							/>
 						</td>
 						<td class="tabular-nums px-4 py-2.5 text-xs text-muted">v{c.schemaVersion}</td>
 						<td class="px-4 py-2.5">
@@ -69,8 +91,8 @@
 						<td class="px-4 py-2.5 text-xs text-muted"><LocalTime iso={c.createdAt} /></td>
 					</tr>
 				{/each}
-				{#if data.configs.items.length === 0}
-					<tr><td colspan="4" class="px-4 py-12 text-center text-muted">No configs.</td></tr>
+				{#if sortedConfigs.length === 0}
+					<tr><td colspan="5" class="px-4 py-12 text-center text-muted">No configs.</td></tr>
 				{/if}
 			</tbody>
 		</table>
