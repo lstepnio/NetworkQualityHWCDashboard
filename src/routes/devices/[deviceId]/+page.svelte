@@ -34,13 +34,23 @@
 	);
 	let avgDownload = $derived(downloads.length === 0 ? undefined : downloads.reduce((a, b) => a + b, 0) / downloads.length);
 	let avgLatency = $derived(latencies.length === 0 ? undefined : Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length));
+
+	function deviceTitle(hsn: string | undefined): string {
+		if (!hsn) return 'Legacy device';
+		if (hsn.length === 64 && /^[0-9a-f]+$/.test(hsn)) return `${shortId(hsn)}…`;
+		return hsn;
+	}
 </script>
 
-<PageHeader eyebrow="Device drill-down" title="{shortId(data.deviceId)}…">
+<PageHeader eyebrow="Device drill-down" title={deviceTitle(latest.hsn)}>
 	{#snippet subtitle()}
 		<span class="flex flex-wrap items-center gap-3">
 			<TierBadge tier={latest.achievedTier} />
-			<span class="font-mono text-[11px] break-all text-muted">{data.deviceId}</span>
+			{#if !latest.hsn}
+				<span class="text-[11px] text-muted italic">HSN not captured for this device</span>
+			{:else if latest.hsn.length === 64 && /^[0-9a-f]+$/.test(latest.hsn)}
+				<span class="text-[11px] text-muted italic">Legacy pre-policy hashed HSN</span>
+			{/if}
 		</span>
 	{/snippet}
 	{#snippet actions()}

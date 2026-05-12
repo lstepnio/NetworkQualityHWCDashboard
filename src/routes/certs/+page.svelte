@@ -193,7 +193,6 @@
 			<thead>
 				<tr class="hairline">
 					<th class={thLeft}><a href={sortHref('completed')} class={sortLink}>Certified{sortArrow('completed')}</a></th>
-					<th class={thLeft}><a href={sortHref('device')} class={sortLink}>Device{sortArrow('device')}</a></th>
 					<th class={thLeft}><a href={sortHref('hsn')} class={sortLink}>HSN{sortArrow('hsn')}</a></th>
 					<th class={thLeft}><a href={sortHref('tier')} class={sortLink}>Tier{sortArrow('tier')}</a></th>
 					<th class={thRight}><a href={sortHref('download')} class={sortLink}>Down{sortArrow('download')}</a></th>
@@ -221,32 +220,31 @@
 							{/if}
 						</td>
 						<td class="px-4 py-2.5">
-							<a
-								href="/devices/{c.deviceId}"
-								class="font-mono text-xs text-muted transition-colors hover:text-pink-500"
-							>
-								{shortId(c.deviceId)}
-							</a>
-						</td>
-						<td class="px-4 py-2.5">
 							{#if c.hsn}
 								{#if c.hsn.length === 64 && /^[0-9a-f]+$/.test(c.hsn)}
-									<span
-										class="font-mono text-xs text-muted/70"
-										title="Legacy pre-policy hash"
+									<a
+										href="/devices/{c.deviceId}"
+										class="font-mono text-xs text-muted/70 transition-colors hover:text-pink-500"
+										title="Legacy pre-policy hashed HSN — click to open device"
 									>
 										{shortId(c.hsn)}…
-									</span>
+									</a>
 								{:else}
 									<a
-										href="/certs?hsn={encodeURIComponent(c.hsn)}"
+										href="/devices/{c.deviceId}"
 										class="font-mono text-xs text-foreground transition-colors hover:text-pink-500"
 									>
 										{c.hsn}
 									</a>
 								{/if}
 							{:else}
-								<span class="text-muted">—</span>
+								<a
+									href="/devices/{c.deviceId}"
+									class="text-xs text-muted/70 italic transition-colors hover:text-pink-500"
+									title="Older device — HSN not captured"
+								>
+									legacy
+								</a>
 							{/if}
 						</td>
 						<td class="px-4 py-2.5">
@@ -281,7 +279,7 @@
 				{/each}
 				{#if data.certs.items.length === 0}
 					<tr>
-						<td colspan="10" class="px-4 py-12 text-center text-muted">No certifications match.</td>
+						<td colspan="9" class="px-4 py-12 text-center text-muted">No certifications match.</td>
 					</tr>
 				{/if}
 			</tbody>

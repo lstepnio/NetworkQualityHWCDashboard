@@ -66,8 +66,7 @@
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="hairline">
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Device</th>
-					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">HSN (hashed)</th>
+					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">HSN</th>
 					<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Runs</th>
 					<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Avg ↓</th>
 					<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Latest tier</th>
@@ -78,15 +77,32 @@
 				{#each devices as d (d.deviceId)}
 					<tr class="border-b border-border transition-colors hover:bg-white/[0.025]">
 						<td class="px-4 py-2.5">
-							<a
-								href="/devices/{d.deviceId}"
-								class="font-mono text-[13px] text-foreground transition-colors hover:text-pink-500"
-							>
-								{shortId(d.deviceId)}…
-							</a>
-						</td>
-						<td class="px-4 py-2.5 font-mono text-xs text-muted">
-							{d.hsn ? `${shortId(d.hsn)}…` : '—'}
+							{#if d.hsn}
+								{#if d.hsn.length === 64 && /^[0-9a-f]+$/.test(d.hsn)}
+									<a
+										href="/devices/{d.deviceId}"
+										class="font-mono text-[13px] text-muted/70 transition-colors hover:text-pink-500"
+										title="Legacy pre-policy hashed HSN"
+									>
+										{shortId(d.hsn)}…
+									</a>
+								{:else}
+									<a
+										href="/devices/{d.deviceId}"
+										class="font-mono text-[13px] text-foreground transition-colors hover:text-pink-500"
+									>
+										{d.hsn}
+									</a>
+								{/if}
+							{:else}
+								<a
+									href="/devices/{d.deviceId}"
+									class="text-[13px] text-muted/70 italic transition-colors hover:text-pink-500"
+									title="Older device — HSN not captured"
+								>
+									legacy device
+								</a>
+							{/if}
 						</td>
 						<td class="tabular-nums px-4 py-2.5 text-right text-xs">{d.runs}</td>
 						<td class="tabular-nums px-4 py-2.5 text-right text-xs">{formatMbps(d.avgDownload)}</td>
@@ -96,7 +112,7 @@
 				{/each}
 				{#if devices.length === 0}
 					<tr>
-						<td colspan="6" class="px-4 py-12 text-center text-muted">
+						<td colspan="5" class="px-4 py-12 text-center text-muted">
 							No devices have reported yet.
 						</td>
 					</tr>
