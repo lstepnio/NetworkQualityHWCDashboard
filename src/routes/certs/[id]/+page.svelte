@@ -84,26 +84,25 @@
 	<Section title="Identity & lineage" description="Hashed PII and the config this run used">
 		<dl class="space-y-2.5 text-sm">
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
-				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">device_id</dt>
-				<dd>
-					<a
-						href="/devices/{summary.deviceId}"
-						class="font-mono text-xs break-all text-foreground transition-colors hover:text-pink-500"
-					>
-						{summary.deviceId} ↗
-					</a>
-				</dd>
-			</div>
-			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
-				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">hsn / serial</dt>
+				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">device (hsn)</dt>
 				<dd class="font-mono text-xs break-all">
 					{#if summary.hsn}
-						{summary.hsn}
+						<a
+							href="/devices/{summary.deviceId}"
+							class="text-foreground transition-colors hover:text-pink-500"
+						>
+							{summary.hsn} ↗
+						</a>
 						{#if summary.hsn.length === 64 && /^[0-9a-f]+$/.test(summary.hsn)}
 							<span class="text-muted">(legacy hash — pre-policy update)</span>
 						{/if}
 					{:else}
-						—
+						<a
+							href="/devices/{summary.deviceId}"
+							class="italic text-muted transition-colors hover:text-pink-500"
+						>
+							Legacy device — HSN not captured ↗
+						</a>
 					{/if}
 				</dd>
 			</div>
