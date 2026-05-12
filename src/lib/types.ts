@@ -24,7 +24,7 @@ export type CertSummary = {
 	// Null on Ethernet or older clients.
 	wifiRating?: string;
 	wifiRssiDbm?: number;
-	publicIpHash?: string; // never the raw IP; backend hashes search inputs
+	publicIp?: string; // plaintext for new rows; legacy rows (ingested before backend v0.7.11) still carry the SHA-256 string
 	enqueuedAt?: string;
 	submittedAt?: string;
 	// submittedAt - completedAt in seconds, clamped >= 0. Omitted by the
