@@ -108,10 +108,10 @@
 			</div>
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
 				<dt class="pt-0.5 text-xs font-medium tracking-[0.12em] text-muted uppercase">
-					publicIp (hashed)
+					publicIp
 				</dt>
 				<dd class="font-mono text-xs break-all">
-					{summary.publicIpHash ?? '—'}
+					{summary.publicIp ?? '—'}
 				</dd>
 			</div>
 			<div class="grid grid-cols-[180px_1fr] items-start gap-3">
