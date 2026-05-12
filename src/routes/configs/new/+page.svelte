@@ -30,25 +30,6 @@
 		}
 	}
 
-	function toggleKillSwitch() {
-		try {
-			const doc = JSON.parse(document);
-			doc.uploadResults = doc.uploadResults ?? {};
-			doc.uploadResults.enabled = !doc.uploadResults.enabled;
-			document = JSON.stringify(doc, null, 2);
-		} catch {
-			/* noop */
-		}
-	}
-
-	let killSwitchState = $derived.by(() => {
-		try {
-			return JSON.parse(document)?.uploadResults?.enabled === true;
-		} catch {
-			return null;
-		}
-	});
-
 	let parsedConfigVersion = $derived.by(() => {
 		try {
 			return String(JSON.parse(document)?.configVersion ?? '');
@@ -100,19 +81,6 @@
 				class="rounded-md border border-border px-2.5 py-1 text-[11px] font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground"
 			>
 				Bump configVersion
-			</button>
-			<button
-				type="button"
-				onclick={toggleKillSwitch}
-				class="rounded-md border border-border px-2.5 py-1 text-[11px] font-medium text-muted transition-colors hover:bg-white/[0.03] hover:text-foreground"
-			>
-				{#if killSwitchState === true}
-					Kill switch: ON → flip OFF
-				{:else if killSwitchState === false}
-					Kill switch: OFF → flip ON
-				{:else}
-					Kill switch: ?
-				{/if}
 			</button>
 			<button
 				type="button"
