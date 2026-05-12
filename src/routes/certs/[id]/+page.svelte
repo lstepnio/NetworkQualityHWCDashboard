@@ -8,6 +8,7 @@
 	import JsonBlock from '$lib/components/JsonBlock.svelte';
 	import { formatMbps, formatMs, humanizeDelay, shortId } from '$lib/format';
 	import LocalTime from '$lib/components/LocalTime.svelte';
+	import type { DnsAssessment } from '$lib/types';
 
 	type WifiLink = {
 		rating?: string;
@@ -23,8 +24,20 @@
 	const summary = $derived(data.detail.summary);
 	// The payload is the raw CertificationResult — wifiLink lives under
 	// result.wifiLink. Null for Ethernet runs and older clients.
-	const wifiLink = $derived(
-		(data.detail.payload?.result as { wifiLink?: WifiLink } | undefined)?.wifiLink
+	const result = $derived(
+		data.detail.payload?.result as
+			| { wifiLink?: WifiLink; dnsAssessment?: DnsAssessment }
+			| undefined
+	);
+	const wifiLink = $derived(result?.wifiLink);
+	// dnsAssessment lives under result.dnsAssessment (contract v2.3.0).
+	// Undefined on pre-v2.3.0 client payloads or when the active config had
+	// no dnsPolicy block — in either case we render nothing.
+	const dnsAssessment = $derived(result?.dnsAssessment);
+	const dnsPreferredTitle = $derived(
+		dnsAssessment?.configuredPreferred?.length
+			? `Configured preferred DNS: ${dnsAssessment.configuredPreferred.join(', ')}`
+			: 'No preferred DNS configured'
 	);
 </script>
 
@@ -159,6 +172,27 @@
 		</dl>
 	</Section>
 </div>
+
+{#if dnsAssessment}
+	<div class="mt-6">
+		{#if dnsAssessment.allPreferred}
+			<span
+				class="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-white/10 px-2 py-0.5 text-xs font-medium tracking-wide text-white/60"
+				title={dnsPreferredTitle}
+			>
+				DNS preferred ✓
+			</span>
+		{:else}
+			<span
+				class="inline-flex items-center gap-1.5 rounded-md border border-pink-500/30 bg-pink-500/15 px-2 py-1 text-xs font-medium tracking-wide text-pink-200"
+				title={dnsPreferredTitle}
+			>
+				<span class="size-1.5 rounded-full bg-pink-400"></span>
+				Non-preferred DNS: {dnsAssessment.nonPreferred.join(', ')}
+			</span>
+		{/if}
+	</div>
+{/if}
 
 <div class="mt-6">
 	<Section title="Full payload" description="Raw CertificationResult as stored after PII redaction">

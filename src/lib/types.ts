@@ -40,6 +40,15 @@ export type CertList = {
 	offset: number;
 };
 
+// Per-cert DNS-policy verdict (contract v2.3.0). Lives in
+// payload.result.dnsAssessment. Omitted on pre-v2.3.0 client payloads or
+// when the active config had no dnsPolicy block.
+export type DnsAssessment = {
+	configuredPreferred: string[];
+	nonPreferred: string[];
+	allPreferred: boolean;
+};
+
 export type CertDetail = {
 	summary: CertSummary;
 	payloadHash: string;
