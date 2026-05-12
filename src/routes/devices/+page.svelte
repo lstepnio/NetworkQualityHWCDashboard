@@ -15,9 +15,6 @@
 		identity: string;
 		hsn?: string;
 		runs: number;
-		// distinct app installs (deviceIds) under this HSN. >1 means
-		// the box was reinstalled / data-wiped at some point.
-		installs: number;
 		latestTier: string;
 		latestReceivedAt: string;
 		avgDownload?: number;
@@ -30,7 +27,6 @@
 	function rollup(items: CertSummary[]): Rollup[] {
 		const byDevice = new Map<string, Rollup>();
 		const downloadAvgs = new Map<string, { sum: number; n: number }>();
-		const installIds = new Map<string, Set<string>>();
 		for (const c of items) {
 			const key = rollupKey(c);
 			const existing = byDevice.get(key);
@@ -39,7 +35,6 @@
 					identity: key,
 					hsn: c.hsn,
 					runs: 1,
-					installs: 1,
 					latestTier: c.achievedTier,
 					latestReceivedAt: c.receivedAt
 				});
@@ -57,17 +52,10 @@
 				acc.n += 1;
 				downloadAvgs.set(key, acc);
 			}
-			const ids = installIds.get(key) ?? new Set<string>();
-			ids.add(c.deviceId);
-			installIds.set(key, ids);
 		}
 		for (const [k, acc] of downloadAvgs) {
 			const r = byDevice.get(k);
 			if (r) r.avgDownload = acc.sum / acc.n;
-		}
-		for (const [k, ids] of installIds) {
-			const r = byDevice.get(k);
-			if (r) r.installs = ids.size;
 		}
 		return [...byDevice.values()].sort(
 			(a, b) => new Date(b.latestReceivedAt).getTime() - new Date(a.latestReceivedAt).getTime()
@@ -118,11 +106,6 @@
 									>
 										{d.hsn}
 									</a>
-								{/if}
-								{#if d.installs > 1}
-									<span class="ml-2 text-[10.5px] text-muted" title="{d.installs} app installs (deviceIds) seen for this box">
-										· {d.installs} installs
-									</span>
 								{/if}
 							{:else}
 								<a
