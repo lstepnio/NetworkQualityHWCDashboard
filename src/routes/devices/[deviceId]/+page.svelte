@@ -3,6 +3,7 @@
 	import Kpi from '$lib/components/Kpi.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import TierBadge from '$lib/components/TierBadge.svelte';
+	import WifiBadge from '$lib/components/WifiBadge.svelte';
 	import TierDistributionChart from '$lib/components/charts/TierDistributionChart.svelte';
 	import ThroughputChart from '$lib/components/charts/ThroughputChart.svelte';
 	import { formatMbps, formatMs, shortId } from '$lib/format';
@@ -69,30 +70,41 @@
 				<thead>
 					<tr class="hairline">
 						<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">When</th>
-						<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">ID</th>
 						<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Tier</th>
 						<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Down</th>
 						<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Up</th>
 						<th class="px-4 py-3 text-right text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Latency</th>
+						<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">WiFi</th>
 						<th class="px-4 py-3 text-left text-[10.5px] font-medium tracking-[0.14em] text-muted uppercase">Config</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#each data.certs.items as c (c.certificationId)}
 						<tr class="border-b border-border transition-colors hover:bg-white/[0.025]">
-							<td class="px-4 py-2.5 text-xs text-muted whitespace-nowrap"><LocalTime iso={c.receivedAt} /></td>
-							<td class="px-4 py-2.5">
+							<td class="px-4 py-2.5 text-xs whitespace-nowrap">
 								<a
 									href="/certs/{c.certificationId}"
-									class="font-mono text-[13px] text-foreground transition-colors hover:text-pink-500"
+									class="text-foreground transition-colors hover:text-pink-500"
 								>
-									{shortId(c.certificationId)}
+									<LocalTime iso={c.receivedAt} />
 								</a>
 							</td>
 							<td class="px-4 py-2.5"><TierBadge tier={c.achievedTier} /></td>
 							<td class="tabular-nums px-4 py-2.5 text-right text-xs">{formatMbps(c.downloadSteadyMbps)}</td>
 							<td class="tabular-nums px-4 py-2.5 text-right text-xs">{formatMbps(c.uploadSteadyMbps)}</td>
 							<td class="tabular-nums px-4 py-2.5 text-right text-xs">{formatMs(c.latencyMedianMs)}</td>
+							<td class="px-4 py-2.5">
+								{#if c.wifiRating || c.wifiRssiDbm != null}
+									<div class="flex items-center gap-2">
+										<WifiBadge rating={c.wifiRating} />
+										{#if c.wifiRssiDbm != null}
+											<span class="tabular-nums text-[11px] text-muted">{c.wifiRssiDbm} dBm</span>
+										{/if}
+									</div>
+								{:else}
+									<span class="text-xs text-muted">—</span>
+								{/if}
+							</td>
 							<td class="px-4 py-2.5 font-mono text-xs text-muted">{c.configVersion ?? '—'}</td>
 						</tr>
 					{/each}

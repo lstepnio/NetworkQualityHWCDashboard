@@ -193,7 +193,6 @@
 			<thead>
 				<tr class="hairline">
 					<th class={thLeft}><a href={sortHref('completed')} class={sortLink}>Certified{sortArrow('completed')}</a></th>
-					<th class={thLeft}>ID</th>
 					<th class={thLeft}><a href={sortHref('device')} class={sortLink}>Device{sortArrow('device')}</a></th>
 					<th class={thLeft}><a href={sortHref('hsn')} class={sortLink}>HSN{sortArrow('hsn')}</a></th>
 					<th class={thLeft}><a href={sortHref('tier')} class={sortLink}>Tier{sortArrow('tier')}</a></th>
@@ -209,14 +208,11 @@
 				{#each data.certs.items as c (c.certificationId)}
 					<tr class="border-b border-border transition-colors hover:bg-white/[0.025]">
 						<td class="px-4 py-2.5 text-xs whitespace-nowrap">
-							<LocalTime iso={c.completedAt} class="text-muted" />
-						</td>
-						<td class="px-4 py-2.5">
 							<a
 								href="/certs/{c.certificationId}"
-								class="font-mono text-[13px] text-foreground transition-colors hover:text-pink-500"
+								class="text-foreground transition-colors hover:text-pink-500"
 							>
-								{shortId(c.certificationId)}
+								<LocalTime iso={c.completedAt} />
 							</a>
 							{#if c.queueDelaySeconds != null && c.queueDelaySeconds > 300}
 								<div class="mt-1">
@@ -285,7 +281,7 @@
 				{/each}
 				{#if data.certs.items.length === 0}
 					<tr>
-						<td colspan="11" class="px-4 py-12 text-center text-muted">No certifications match.</td>
+						<td colspan="10" class="px-4 py-12 text-center text-muted">No certifications match.</td>
 					</tr>
 				{/if}
 			</tbody>
